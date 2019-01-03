@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="{{ @LANGUAGE }}">
+<head>
+    <include href="blocks/head.html" />
+    <style type="text/css">
+        .kanban-board {
+            display: flex;
+            transition: opacity 0.2s ease;
+        }
+        .kanban-board.is-loading {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .kanban-swimlane {
+            width: 280px;
+            min-width: 230px;
+            margin: 0 0 15px 15px;
+        }
+        .kanban-swimlane:last-child {
+            margin-right: 15px;
+        }
+        .kanban-swimlane > .panel-body {
+            max-height: calc(100vh - 160px);
+            padding-bottom: 0;
+            overflow-y: auto;
+        }
+        .kanban-swimlane > .panel-body > div {
+            min-height: calc(80vh - 160px);
+        }
+        .kanban-issue {
+            margin-bottom: 15px;
+            border-left-width: 4px;
+            cursor: move;
+        }
+    </style>
+</head>
+<body>
+    <set fullwidth="{{ true }}" />
+    <include href="blocks/navbar.html" />
+    <div id="root">
+        <!-- TODO: add filter options for types, and a UI for selecting the group to display -->
+        <kanban-board
+            :group-id="{{ @group }}"
+            :sprint-id="{{ @sprint }}">
+        </kanban-board>
+    </div>
+    <include href="blocks/footer-modals.html" if="{{ !empty(@user.id) }}" />
+    <include href="blocks/footer-scripts.html" />
+    <check if="{{ @DEBUG >= 2 }}">
+        <true>
+            <script src="https://cdn.jsdelivr.net/npm/vue@2.5.21/dist/vue.js"></script>
+        </true>
+        <false>
+            <script src="https://cdn.jsdelivr.net/npm/vue@2.5.21"></script>
+        </false>
+    </check>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.7.0/Sortable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Vue.Draggable/2.17.0/vuedraggable.min.js"></script>
+    <script type="text/javascript" src="{{ @BASE }}/app/plugin/kanban/js/kanban.js"></script>
+</body>
+</html>
