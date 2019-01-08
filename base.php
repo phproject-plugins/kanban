@@ -35,7 +35,7 @@ $('.dropdown-menu a').click(function(e) {
                 let sprintId = $('.list-group', this).attr('data-list-id');
                 $('.sprint-board', this).after(
                     $('<a />')
-                        .attr('href', BASE + '/kanban/' + groupId + '/' + sprintId)
+                        .attr('href', BASE + '/kanban/' + sprintId + '/' + groupId)
                         .addClass('kanban-board btn btn-default btn-xs pull-right')
                         .html('<span class=\"fa fa-bars fa-rotate-90\"></span> Kanban')
                 );
