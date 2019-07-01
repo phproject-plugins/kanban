@@ -84,7 +84,7 @@ Vue.component('kanban-issue', {
             <div class="panel-body">\
                 {{ issue.name }}<br>\
                 <small>\
-                    <a href="/issues/{{ issue.id }}" target="_blank">\
+                    <a :href="\'/issues/\' + issue.id" target="_blank">\
                         #{{ issue.id }}\
                     </a>&ensp;{{ issue.owner_name }}\
                 </small>\
