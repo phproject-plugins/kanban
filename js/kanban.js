@@ -1,7 +1,7 @@
 Vue.component('kanban-board', {
     props: {
         groupId: Number,
-        sprintId: Number
+        sprintId: Number,
     },
     data: function () {
         return {
@@ -83,7 +83,11 @@ Vue.component('kanban-issue', {
             :data-id="issue.id">\
             <div class="panel-body">\
                 {{ issue.name }}<br>\
-                <small>{{ issue.owner_name }}</small>\
+                <small>\
+                    <a href="/issues/{{ issue.id }}" target="_blank">\
+                        #{{ issue.id }}\
+                    </a>&ensp;{{ issue.owner_name }}\
+                </small>\
             </div>\
         </div>'
 });
