@@ -36,7 +36,7 @@ Vue.component('kanban-board', {
             let status = $(event.to).closest('.kanban-swimlane').attr('data-id');
             var index = null;
             var issueId = $(event.item).attr('data-id');
-            this.issues.some(function(issue, i) {
+            this.issues.some(function (issue, i) {
                 if (issue.id == issueId) {
                     index = i;
                     return true;

@@ -23,26 +23,24 @@ class Controller extends \Controller
      * View a Kanban board
      *
      * Accepts parameters: group, sprint
-     *
-     * @param \Base $f3
-     * @param array $params
      */
-    public function index(\Base $f3, array $params)
+    public function index(\Base $f3, array $params): void
     {
-        $group = new User;
+        $group = new User();
         $group->load($params['group']);
         if (!$group->id) {
             $f3->error(404);
             return;
         }
 
-        $sprint = new Sprint;
-        if (empty($params['sprint']) || !intval($params['sprint'])) {
+        $sprint = new Sprint();
+        if (empty($params['sprint']) || intval($params['sprint']) === 0) {
             $localDate = date('Y-m-d', View::instance()->utc2local());
             $sprint->load(['? BETWEEN start_date AND end_date', $localDate]);
         } else {
             $sprint = $sprint->load($params['sprint']);
         }
+
         if (!$sprint->id) {
             $f3->error(404);
             return;
@@ -56,39 +54,39 @@ class Controller extends \Controller
 
     /**
      * Get swimlanes for the Kanban board
-     * @param \Base $f3
      */
-    public function boardLanes(\Base $f3)
+    public function boardLanes(\Base $f3): void
     {
-        $statusModel = new Status;
+        $statusModel = new Status();
         $statuses = $statusModel->find('taskboard > 0', ['order' => 'taskboard_sort ASC']);
         $return = [];
         foreach ($statuses as $status) {
             $return[] = $status->cast();
         }
+
         $this->_printJson($return);
     }
 
     /**
      * Get items on the Kanban board
-     * @param \Base $f3
      */
-    public function boardData(\Base $f3)
+    public function boardData(\Base $f3): void
     {
         $groupId = $f3->get('GET.group');
         if (!$groupId) {
             $f3->error(400, 'A group ID is required to load board data.');
         }
+
         $sprintId = $f3->get('GET.sprint');
-        if (!intval($sprintId)) {
+        if (intval($sprintId) === 0) {
             $f3->error(400, 'A sprint ID is required to load board data.');
         }
 
         // Add owner/sprint filters
-        $user = new User;
+        $user = new User();
         $user->load($groupId);
         if ($user->role == 'group') {
-            $groupModel = new Group;
+            $groupModel = new Group();
             $groupUsers = $groupModel->find(['group_id = ?', $user->id]);
             $filterUsers = [intval($groupId)];
             foreach ($groupUsers as $u) {
@@ -97,38 +95,42 @@ class Controller extends \Controller
         } else {
             $filterUsers = [intval($groupId)];
         }
+
         $ownerStr = implode(',', $filterUsers);
-        $filter = "owner_id IN ($ownerStr)";
+        $filter = "owner_id IN ({$ownerStr})";
         $filter .=  ' AND sprint_id = ' . intval($sprintId);
 
         // Add status filter
-        $statusModel = new Status;
+        $statusModel = new Status();
         $statuses = $statusModel->find('taskboard > 0', ['order' => 'taskboard_sort ASC']);
         $statusIds = [];
         foreach ($statuses as $status) {
             $statusIds[] = $status->id;
         }
+
         $statusStr = implode(',', $statusIds);
-        $filter .= " AND status IN ($statusStr)";
+        $filter .= " AND status IN ({$statusStr})";
 
         // Add type filter
-        $type = new Type;
+        $type = new Type();
         $types = $type->find(['role = ?', 'project']);
         $typeIds = [];
         foreach ($types as $type) {
             $typeIds[] = $type->id;
         }
+
         $typeStr = implode(',', $typeIds);
-        $filter .= " AND type_id IN ($typeStr)";
+        $filter .= " AND type_id IN ({$typeStr})";
 
         // Find issues
-        $issueModel = new IssueDetail;
-        $backlogModel = new Backlog;
+        $issueModel = new IssueDetail();
+        $backlogModel = new Backlog();
         $backlog = $backlogModel->load(['sprint_id' => intval($sprintId)]);
         if ($backlog->issues) {
-            $backlogIds = "'" . implode("','", explode(',', trim($backlog->issues, '[]'))) . "'" ?: "'0'";
+            $backlogIds = "'" . implode("','", explode(',', trim((string) $backlog->issues, '[]'))) . "'" !== '' && "'" . implode("','", explode(',', trim((string) $backlog->issues, '[]'))) . "'" !== '0' ? "'" . implode("','", explode(',', trim((string) $backlog->issues, '[]'))) . "'" : "'0'";
         }
-        $issues = $issueModel->find($filter, $backlog->issues ? ['order' => "FIELD(id, $backlogIds), id"] : null);
+
+        $issues = $issueModel->find($filter, $backlog->issues ? ['order' => "FIELD(id, {$backlogIds}), id"] : null);
         $return = [];
         foreach ($issues as $issue) {
             $return[] = [
@@ -147,13 +149,10 @@ class Controller extends \Controller
 
     /**
      * Handle moving issues on the board
-     *
-     * @param \Base $f3
-     * @param array $params
      */
-    public function move(\Base $f3, array $params)
+    public function move(\Base $f3, array $params): void
     {
-        $issue = new Issue;
+        $issue = new Issue();
         $issue->load($params['id']);
         if (!$issue->id) {
             $f3->error(404);
@@ -163,6 +162,6 @@ class Controller extends \Controller
         $issue->status = $f3->get('POST.status');
         $issue->save();
 
-        return $this->_printJson($issue->cast());
+        $this->_printJson($issue->cast());
     }
 }

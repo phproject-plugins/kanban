@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package  Kanban
  * @author   Alan Hardman <alan@phproject.org>
@@ -14,7 +15,8 @@ class Base extends \Plugin
      * Initialize the plugin
      * @todo load configuration and initialize socket connection
      */
-    public function _load() {
+    public function _load()
+    {
         $f3 = \Base::instance();
 
         // Set up routes
